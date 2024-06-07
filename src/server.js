@@ -22,5 +22,21 @@ const server = stoppable(
   })
 );
 
+// Gracefully shutdown the server when we receive a signal
+const shutdown = (signal) => {
+  signal ? logger.debug(`${signal} signal received: closing HTTP server`) 
+         : null;
+         
+  server.close(() => {
+    logger.info('Server has stopped.');
+  });
+};
+
+// Listen for kill signals to stop the server
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
+
+
+
 // Export our server instance so other parts of our code can access it if necessary.
 module.exports = server;
