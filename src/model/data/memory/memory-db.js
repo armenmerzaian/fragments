@@ -1,3 +1,4 @@
+//professor
 const validateKey = (key) => typeof key === 'string';
 
 class MemoryDB {
