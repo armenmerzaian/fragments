@@ -133,7 +133,7 @@ describe('POST /v1/fragments', () => {
       expect(res.get('Content-Type')).toBe('application/json; charset=utf-8');
       expect(res.get('Content-Length')).toBeDefined();
       expect(res.get('Location')).toBe(
-        `${process.env.API_URL}/v1/fragments/${res.body.fragment.id}`
+        `${process.env.API_URL || res.request.host}/v1/fragments/${res.body.fragment.id}`
       );
     });
   });
