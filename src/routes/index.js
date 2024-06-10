@@ -14,8 +14,11 @@ const { authenticate } = require('../auth');
 // Our response helpers
 const { createSuccessResponse } = require('../response');
 
+const logger = require('../logger');
+
 /**
  * Expose all of our API routes on /v1/* to include an API version.
+ * And all routes have to be authenticated.
  */
 router.use(`/v1`, authenticate(), require('./api'));
 
@@ -24,12 +27,12 @@ router.use(`/v1`, authenticate(), require('./api'));
  * we'll respond with a 200 OK.  If not, the server isn't healthy.
  */
 router.get('/', (req, res) => {
+  logger.info('Health check route accessed');
   // Client's shouldn't cache this response (always request it fresh)
   res.setHeader('Cache-Control', 'no-cache');
   // Send a 200 'OK' response
   res.status(200).json(createSuccessResponse({
     author,
-    // Use your own GitHub URL for this!
     githubUrl: 'https://github.com/armenmerzaian/fragments',
     version,
   }));

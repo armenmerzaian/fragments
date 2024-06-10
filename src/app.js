@@ -39,6 +39,7 @@ app.use('/', require('./routes'));
 
 // Add 404 middleware to handle any requests for resources that can't be found
 app.use((req, res) => {
+  logger.warn(`404: Requested Resource Not Found. ${req.method} ${req.originalUrl}`);
   res.status(404).json(createErrorResponse({
     error: {
       message: 'not found',
@@ -58,6 +59,9 @@ app.use((err, req, res, next) => {
   // If this is a server error, log something so we can see what's going on.
   if (status > 499) {
     logger.error({ err }, `Error processing request`);
+  } else {
+    // Otherwise, log as a warning (client level error)
+    logger.warn({ err }, `Error processing request`);
   }
 
   res.status(status).json(createErrorResponse({
