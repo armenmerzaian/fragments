@@ -11,7 +11,16 @@ module.exports = async (req, res) => {
   logger.info('GET /v1/fragments called')
   try {
     const userId = req.user; // Authenticated user's ID
-    const fragments = await Fragment.byUser(userId);
+    const queryExpand = req.query.expand === '1';
+    
+    let fragments;
+    if (queryExpand) {
+       // Get full metadata for all fragments
+       fragments = await Fragment.byUser(userId, queryExpand);
+    } else {
+       // Get only the IDs of fragments
+       fragments = await Fragment.byUser(userId);
+    }
     
     logger.info(`Returning ${fragments.length} fragments for user ${userId}`);
     res.status(200).json(createSuccessResponse({ fragments }));
