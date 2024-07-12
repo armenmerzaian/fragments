@@ -18,6 +18,12 @@ const {
 
 const supportedTypes = [
   'text/plain',
+  'text/plain; charset=utf-8',
+  'text/markdown',
+  'text/html',
+  'text/csv',
+  'application/json',
+  'application/yaml',
 ]
 
 class Fragment {
@@ -134,7 +140,11 @@ class Fragment {
    */
   get formats() {
     if (this.isText) {
-      return ['text/plain'];
+      if (this.type === 'text/plain' || this.type === 'text/plain; charset=utf-8') {
+        return ['text/plain'];
+      } else if (this.type === 'text/markdown') {
+        return ['text/markdown', 'text/html', 'text/plain'];
+      }
     }
     return [];
   }

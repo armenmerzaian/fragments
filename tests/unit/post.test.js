@@ -30,7 +30,59 @@ describe('POST /v1/fragments', () => {
 
       expect(res.statusCode).toBe(201);
     });
+
+    test('authenticated users can create a plain text fragment with charset=utf-8', async () => {
+      const res = await request(app)
+        .post('/v1/fragments')
+        .auth('user1@email.com', 'password1')
+        .set('Content-Type', 'text/plain; charset=utf-8')
+        .send('This is a fragment with charset');
+
+      expect(res.statusCode).toBe(201);
+      expect(res.body.fragment.type).toBe('text/plain; charset=utf-8');
+    });
+
+    test('authenticated users can create a JSON fragment', async () => {
+      const res = await request(app)
+        .post('/v1/fragments')
+        .auth('user1@email.com', 'password1')
+        .set('Content-Type', 'application/json')
+        .send(JSON.stringify({ message: 'This is a JSON fragment' }));
+  
+      expect(res.statusCode).toBe(201);
+    });
+  
+    test('authenticated users can create a Markdown fragment', async () => {
+      const res = await request(app)
+        .post('/v1/fragments')
+        .auth('user1@email.com', 'password1')
+        .set('Content-Type', 'text/markdown')
+        .send('# This is a markdown fragment');
+  
+      expect(res.statusCode).toBe(201);
+    });
+  
+    test('authenticated users can create an HTML fragment', async () => {
+      const res = await request(app)
+        .post('/v1/fragments')
+        .auth('user1@email.com', 'password1')
+        .set('Content-Type', 'text/html')
+        .send('<p>This is a HTML fragment</p>');
+  
+      expect(res.statusCode).toBe(201);
+    });
+  
+    test('authenticated users can create a CSV fragment', async () => {
+      const res = await request(app)
+        .post('/v1/fragments')
+        .auth('user1@email.com', 'password1')
+        .set('Content-Type', 'text/csv')
+        .send('firstname,lastname\narmen,merzaian\nsanta,claus');
+  
+      expect(res.statusCode).toBe(201);
+    });
   });
+
 
   describe('Content-Type tests', () => {
     // Invalid requests
