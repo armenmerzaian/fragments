@@ -43,4 +43,39 @@ describe('GET /v1/fragments', () => {
     expect(Array.isArray(res.body.fragments)).toBe(true);
     expect(res.body.fragments.length).toBe(0);
   });
+
+  test('authenticated user gets their expanded fragment metadata with expand=1', async () => {
+    const userEmail = 'user1@email.com';
+    const userId = hash(userEmail);
+
+    const fragment1 = new Fragment({ id: '100', ownerId: userId, type: 'text/plain', size: 5 });
+    const fragment2 = new Fragment({ id: '101', ownerId: userId, type: 'text/plain', size: 10 });
+    await fragment1.save();
+    await fragment2.save();
+
+    const res = await request(app)
+      .get('/v1/fragments?expand=1')
+      .auth('user1@email.com', 'password1');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.status).toBe('ok');
+    expect(Array.isArray(res.body.fragments)).toBe(true);
+    expect(res.body.fragments).toEqual([
+      {
+        id: '100',
+        ownerId: userId,
+        type: 'text/plain',
+        size: 5,
+        created: fragment1.created,
+        updated: fragment1.updated,
+      },
+      {
+        id: '101',
+        ownerId: userId,
+        type: 'text/plain',
+        size: 10,
+        created: fragment2.created,
+        updated: fragment2.updated,
+      },
+    ]);
+  });
 });
