@@ -6,6 +6,8 @@ const { randomUUID } = require('crypto');
 // Use https://www.npmjs.com/package/content-type to create/parse Content-Type headers
 const contentType = require('content-type');
 
+const MarkdownIt = require('markdown-it');
+
 // Functions for working with fragment metadata/data using our DB
 const {
   readFragment,
@@ -29,7 +31,7 @@ const supportedTypes = [
 class Fragment {
 
   constructor({ id, ownerId, created, updated, type, size = 0 }) {
-    
+
     if (!ownerId || !type) {
       throw new Error('ownerId and type are required');
     }
@@ -72,7 +74,11 @@ class Fragment {
    * @returns Promise<Fragment>
    */
   static async byId(ownerId, id) {
-    return new Fragment(await readFragment(ownerId, id));
+    const fragmentData = await readFragment(ownerId, id);
+    if (!fragmentData) {
+      throw new Error(`Fragment not found: ${id}`);
+    }
+    return new Fragment(fragmentData);
   }
 
   /**
@@ -157,6 +163,27 @@ class Fragment {
   static isSupportedType(value) {
     const {type} = contentType.parse(value);
     return supportedTypes.includes(type); //true if yes, false if no
+  }
+
+  /**
+   * Converts fragment data to a supported format based on the extension.
+   * @param {Buffer} data - The fragment data.
+   * @param {string} ext - The target extension for conversion (e.g., .html).
+   * @returns {Object} - An object containing the converted data and content type.
+   */
+  async convertTo(data, ext) {
+    let convertedData;
+    let convertedType;
+
+    if (this.type === 'text/markdown' && ext === '.html') {
+      const md = new MarkdownIt();
+      convertedData = Buffer.from(md.render(data.toString()));
+      convertedType = 'text/html';
+    } else {
+      throw new Error('Unsupported conversion');
+    }
+
+    return { data: convertedData, type: convertedType };
   }
 }
 
