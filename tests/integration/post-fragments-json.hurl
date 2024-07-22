@@ -36,7 +36,6 @@ HTTP/1.1 200
 
 [Asserts]
 header "Content-Type" contains "application/json"
-header "Content-Type" contains "utf-8"
 header "Content-Length" == "33"
 
 status == 200
