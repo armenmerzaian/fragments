@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
   await fragment.setData(body);
 
   const apiBaseUrl = req.headers.host || process.env.API_URL;
-  const apiFullUrl = `${apiBaseUrl}/v1/fragments/${fragment.id}`;
+  const apiFullUrl = `http://${apiBaseUrl}/v1/fragments/${fragment.id}`;
   logger.debug({apiFullUrl}, "Sending success response")
   res.setHeader('Location', apiFullUrl);
   res.status(201).json(createSuccessResponse({ fragment: fragment }));
