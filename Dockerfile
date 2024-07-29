@@ -49,7 +49,7 @@ COPY ./tests/.htpasswd ./tests/.htpasswd
 FROM node:20.14-alpine3.20@sha256:804aa6a6476a7e2a5df8db28804aa6c1c97904eefb01deed5d6af24bb51d0c81 AS deploy
 
 # Install curl for health checks
-RUN apk --no-cache add curl=8.8.0-r0
+RUN apk --no-cache add curl=8.9.0-r0
 
 # Use /app as our working directory
 WORKDIR /app
