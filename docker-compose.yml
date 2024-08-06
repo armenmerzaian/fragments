@@ -7,7 +7,10 @@ services:
     init: true
     # Build the Docker Image using the Dockerfile
     # and current directory as the build context
-    build: .
+    build: 
+      context: .
+      args:
+        - ARCH=arm64
     # Environment variables to use
     environment:
       # Our API will be running on http://localhost:8080
@@ -27,6 +30,9 @@ services:
       # something else is defined in the env.
       - AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME:-fragments}
       - AWS_DYNAMODB_TABLE_NAME=${AWS_DYNAMODB_TABLE_NAME:-fragments}
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_SESSION_TOKEN=dummy-session-token
     # Ports to publish
     ports:
       - '8080:8080'

@@ -129,4 +129,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+
+# random
+.DS_Store
 *.gitignore.*
