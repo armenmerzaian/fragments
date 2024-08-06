@@ -1,20 +1,16 @@
 // src/routes/index.js
 
 const express = require('express');
-
 // version and author from package.json
 const { version, author } = require('../../package.json');
-
 // Create a router that we can use to mount our API
 const router = express.Router();
-
 // Our authentication middleware
 const { authenticate } = require('../auth');
-
 // Our response helpers
 const { createSuccessResponse } = require('../response');
-
 const logger = require('../logger');
+const { hostname } = require('os');
 
 /**
  * Expose all of our API routes on /v1/* to include an API version.
@@ -35,6 +31,7 @@ router.get('/', (req, res) => {
     author,
     githubUrl: 'https://github.com/armenmerzaian/fragments',
     version,
+    hostname: hostname(),
   }));
 });
 
