@@ -31,11 +31,9 @@ module.exports = async (req, res) => {
     res.status(200).json(createSuccessResponse({ fragment }));
   } catch (err) {
     logger.error({ err }, 'Error updating fragment');
-    console.log(err);
     if (err.message.includes('Fragment not found')) {
       res.status(404).json(createErrorResponse(404, 'Fragment not found'));
     } else {
-      console.log(err);
       res.status(500).json(createErrorResponse(500, 'Unable to update fragment'));
     }
   }
