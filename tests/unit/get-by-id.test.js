@@ -81,7 +81,7 @@ describe('GET /v1/fragments/:id', () => {
     await fragment.setData(Buffer.from('# This is a fragment'));
 
     const res = await request(app)
-      .get(`/v1/fragments/${fragmentId}.txt`)
+      .get(`/v1/fragments/${fragmentId}.png`)
       .auth(userEmail, 'password1');
     expect(res.statusCode).toBe(415);
     expect(res.body.status).toBe('error');

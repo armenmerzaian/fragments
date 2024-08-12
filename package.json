@@ -7,7 +7,7 @@
   "scripts": {
     "test:watch": "jest -c jest.config.js --runInBand --watch --",
     "test": "jest -c jest.config.js --runInBand --",
-    "test:integration": "hurl --test --glob \"tests/integration/**/*.hurl\"",
+    "test:integration": "hurl --test --file-root . --glob \"tests/integration/**/*.hurl\"",
     "coverage": "jest -c jest.config.js --runInBand --coverage ",
     "lint": "eslint --config eslint.config.mjs \"./src/**/*.js\" \"tests/**/*.js\"",
     "start": "node src/index.js",
@@ -49,6 +49,8 @@
     "pino": "^9.0.0",
     "pino-http": "^10.1.0",
     "pino-pretty": "^11.0.0",
-    "stoppable": "^1.1.0"
+    "sharp": "^0.33.4",
+    "stoppable": "^1.1.0",
+    "yaml": "^2.5.0"
   }
 }

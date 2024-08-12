@@ -3,6 +3,7 @@
 const request = require('supertest');
 const app = require('../../src/app');
 const hash = require('../../src/hash');
+const sharp = require('sharp');
 require('dotenv').config();
 
 describe('POST /v1/fragments', () => {
@@ -79,6 +80,111 @@ describe('POST /v1/fragments', () => {
         .set('Content-Type', 'text/csv')
         .send('firstname,lastname\narmen,merzaian\nsanta,claus');
   
+      expect(res.statusCode).toBe(201);
+    });
+
+    test('authenticated users can create a PNG image fragment', async () => {
+      const imageBuffer = await sharp({
+        create: {
+          width: 100,
+          height: 100,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+        },
+      })
+        .png()
+        .toBuffer();
+
+      const res = await request(app)
+        .post('/v1/fragments')
+        .auth('user1@email.com', 'password1')
+        .set('Content-Type', 'image/png')
+        .send(imageBuffer);
+
+      expect(res.statusCode).toBe(201);
+    });
+
+    test('authenticated users can create a JPEG image fragment', async () => {
+      const imageBuffer = await sharp({
+        create: {
+          width: 100,
+          height: 100,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+        },
+      })
+        .jpeg()
+        .toBuffer();
+
+      const res = await request(app)
+        .post('/v1/fragments')
+        .auth('user1@email.com', 'password1')
+        .set('Content-Type', 'image/jpeg')
+        .send(imageBuffer);
+
+      expect(res.statusCode).toBe(201);
+    });
+
+    test('authenticated users can create a WebP image fragment', async () => {
+      const imageBuffer = await sharp({
+        create: {
+          width: 100,
+          height: 100,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+        },
+      })
+        .webp()
+        .toBuffer();
+
+      const res = await request(app)
+        .post('/v1/fragments')
+        .auth('user1@email.com', 'password1')
+        .set('Content-Type', 'image/webp')
+        .send(imageBuffer);
+
+      expect(res.statusCode).toBe(201);
+    });
+
+    test('authenticated users can create a GIF image fragment', async () => {
+      const imageBuffer = await sharp({
+        create: {
+          width: 100,
+          height: 100,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+        },
+      })
+        .gif()
+        .toBuffer();
+
+      const res = await request(app)
+        .post('/v1/fragments')
+        .auth('user1@email.com', 'password1')
+        .set('Content-Type', 'image/gif')
+        .send(imageBuffer);
+
+      expect(res.statusCode).toBe(201);
+    });
+
+    test('authenticated users can create an AVIF image fragment', async () => {
+      const imageBuffer = await sharp({
+        create: {
+          width: 100,
+          height: 100,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+        },
+      })
+        .avif()
+        .toBuffer();
+
+      const res = await request(app)
+        .post('/v1/fragments')
+        .auth('user1@email.com', 'password1')
+        .set('Content-Type', 'image/avif')
+        .send(imageBuffer);
+
       expect(res.statusCode).toBe(201);
     });
   });
