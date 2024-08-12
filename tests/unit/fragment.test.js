@@ -1,5 +1,6 @@
-//Professor
 const { Fragment } = require('../../src/model/fragment');
+const sharp = require('sharp');
+const yaml = require('yaml');
 
 // Wait for a certain number of ms. Feel free to change this value
 // if it isn't long enough for your test runs. Returns a Promise.
@@ -13,13 +14,11 @@ const validTypes = [
   `text/csv`,
   `application/json`,
   `application/yaml`,
-  /*
-   Currently, only text/ and application/ is supported. Others will be added later.
   `image/png`,
   `image/jpeg`,
   `image/webp`,
   `image/gif`,
-  */
+  `image/avif`,
 ];
 
 describe('Fragment class', () => {
@@ -162,7 +161,7 @@ describe('Fragment class', () => {
     });
   });
 
-  describe('formats', () => {
+  describe('formats()', () => {
     test('formats returns the expected result for plain text', () => {
       const fragment = new Fragment({
         ownerId: '1234',
@@ -189,7 +188,117 @@ describe('Fragment class', () => {
       });
       expect(fragment.formats).toEqual(['text/markdown', 'text/html', 'text/plain']);
     });
+    
+     test('formats returns the expected result for HTML', () => {
+       const fragment = new Fragment({
+         ownerId: '1234',
+         type: 'text/html',
+         size: 0,
+       });
+       expect(fragment.formats).toEqual(['text/html', 'text/plain']);
+     });
 
+     test('formats returns the expected result for CSV', () => {
+       const fragment = new Fragment({
+         ownerId: '1234',
+         type: 'text/csv',
+         size: 0,
+       });
+       expect(fragment.formats).toEqual(['text/csv', 'text/plain', 'application/json']);
+     });
+
+     test('formats returns the expected result for JSON', () => {
+       const fragment = new Fragment({
+         ownerId: '1234',
+         type: 'application/json',
+         size: 0,
+       });
+       expect(fragment.formats).toEqual(['application/json', 'application/yaml', 'text/plain']);
+     });
+
+     test('formats returns the expected result for YAML', () => {
+       const fragment = new Fragment({
+         ownerId: '1234',
+         type: 'application/yaml',
+         size: 0,
+       });
+       expect(fragment.formats).toEqual(['application/yaml', 'text/plain']);
+     });
+
+     test('formats returns the expected result for PNG image', () => {
+       const fragment = new Fragment({
+         ownerId: '1234',
+         type: 'image/png',
+         size: 0,
+       });
+       expect(fragment.formats).toEqual([
+         'image/png',
+         'image/jpeg',
+         'image/webp',
+         'image/gif',
+         'image/avif',
+       ]);
+     });
+
+     test('formats returns the expected result for JPEG image', () => {
+       const fragment = new Fragment({
+         ownerId: '1234',
+         type: 'image/jpeg',
+         size: 0,
+       });
+       expect(fragment.formats).toEqual([
+         'image/png',
+         'image/jpeg',
+         'image/webp',
+         'image/gif',
+         'image/avif',
+       ]);
+     });
+
+     test('formats returns the expected result for WebP image', () => {
+       const fragment = new Fragment({
+         ownerId: '1234',
+         type: 'image/webp',
+         size: 0,
+       });
+       expect(fragment.formats).toEqual([
+         'image/png',
+         'image/jpeg',
+         'image/webp',
+         'image/gif',
+         'image/avif',
+       ]);
+     });
+
+     test('formats returns the expected result for GIF image', () => {
+       const fragment = new Fragment({
+         ownerId: '1234',
+         type: 'image/gif',
+         size: 0,
+       });
+       expect(fragment.formats).toEqual([
+         'image/png',
+         'image/jpeg',
+         'image/webp',
+         'image/gif',
+         'image/avif',
+       ]);
+     });
+
+     test('formats returns the expected result for AVIF image', () => {
+       const fragment = new Fragment({
+         ownerId: '1234',
+         type: 'image/avif',
+         size: 0,
+       });
+       expect(fragment.formats).toEqual([
+         'image/png',
+         'image/jpeg',
+         'image/webp',
+         'image/gif',
+         'image/avif',
+       ]);
+     });
   });
 
   describe('save(), getData(), setData(), byId(), byUser(), delete()', () => {
@@ -274,6 +383,142 @@ describe('Fragment class', () => {
 
       await Fragment.delete('1234', fragment.id);
       expect(() => Fragment.byId('1234', fragment.id)).rejects.toThrow();
+    });
+  });
+
+  describe('convertTo()', () => {
+    test('converts text/plain to text/plain', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'text/plain', size: 0 });
+      const data = Buffer.from('hello');
+      const result = await fragment.convertTo(data, '.txt');
+      expect(result.type).toBe('text/plain');
+      expect(result.data.toString()).toBe('hello');
+    });
+
+    test('converts text/markdown to text/markdown', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'text/markdown', size: 0 });
+      const data = Buffer.from('# Hello');
+      const result = await fragment.convertTo(data, '.md');
+      expect(result.type).toBe('text/markdown');
+      expect(result.data.toString()).toBe('# Hello');
+    });
+
+    test('converts text/markdown to text/html', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'text/markdown', size: 0 });
+      const data = Buffer.from('# Hello');
+      const result = await fragment.convertTo(data, '.html');
+      expect(result.type).toBe('text/html');
+      expect(result.data.toString()).toContain('<h1>Hello</h1>');
+    });
+
+    test('converts text/html to text/html', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'text/html', size: 14 });
+      const data = Buffer.from('<h1>Hello</h1>');
+      const result = await fragment.convertTo(data, '.html');
+      expect(result.type).toBe('text/html');
+      expect(result.data.toString()).toBe('<h1>Hello</h1>');
+    });
+
+    test('converts text/html to text/plain', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'text/html', size: 0 });
+      const data = Buffer.from('<h1>Hello</h1>');
+      const result = await fragment.convertTo(data, '.txt');
+      expect(result.type).toBe('text/plain');
+      expect(result.data.toString()).toBe('<h1>Hello</h1>');
+    });
+
+    test('converts text/csv to text/csv', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'text/csv', size: 0 });
+      const data = Buffer.from('name,age\nJohn,30\nJane,25');
+      const result = await fragment.convertTo(data, '.csv');
+      expect(result.type).toBe('text/csv');
+      expect(result.data.toString()).toBe('name,age\nJohn,30\nJane,25');
+    });
+
+    test('converts text/csv to text/plain', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'text/csv', size: 0 });
+      const data = Buffer.from('name,age\nJohn,30\nJane,25');
+      const result = await fragment.convertTo(data, '.txt');
+      expect(result.type).toBe('text/plain');
+      expect(result.data.toString()).toBe('name,age\nJohn,30\nJane,25');
+    });
+
+    test('converts text/csv to application/json', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'text/csv', size: 0 });
+      const data = Buffer.from('name,age\nJohn,30\nJane,25');
+      const result = await fragment.convertTo(data, '.json');
+      expect(result.type).toBe('application/json');
+      expect(JSON.parse(result.data.toString())).toEqual([
+        { name: 'John', age: '30' },
+        { name: 'Jane', age: '25' },
+      ]);
+    });
+
+    test('converts application/json to application/json', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'application/json', size: 0 });
+      const data = Buffer.from(JSON.stringify({ name: 'John', age: 30 }));
+      const result = await fragment.convertTo(data, '.json');
+      expect(result.type).toBe('application/json');
+      expect(result.data.toString()).toBe(JSON.stringify({ name: 'John', age: 30 }));
+    });
+
+    test('converts application/json to text/plain', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'application/json', size: 0 });
+      const data = Buffer.from(JSON.stringify({ name: 'John', age: 30 }));
+      const result = await fragment.convertTo(data, '.txt');
+      expect(result.type).toBe('text/plain');
+      expect(result.data.toString()).toBe(JSON.stringify({ name: 'John', age: 30 }));
+    });
+
+    test('converts application/json to application/yaml', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'application/json', size: 0 });
+      const data = Buffer.from(JSON.stringify({ name: 'John', age: 30 }));
+      const result = await fragment.convertTo(data, '.yaml');
+      expect(result.type).toBe('application/yaml');
+      expect(result.data.toString()).toContain('name: John');
+      expect(result.data.toString()).toContain('age: 30');
+    });
+
+    test('converts application/yaml to application/yaml', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'application/yaml', size: 0 });
+      const data = Buffer.from(yaml.stringify({ name: 'John', age: 30 }));
+      const result = await fragment.convertTo(data, '.yaml');
+      expect(result.type).toBe('application/yaml');
+      expect(result.data.toString()).toContain('name: John');
+      expect(result.data.toString()).toContain('age: 30');
+    });
+
+    test('converts application/yaml to text/plain', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'application/yaml', size: 0 });
+      const data = Buffer.from(yaml.stringify({ name: 'John', age: 30 }));
+      const result = await fragment.convertTo(data, '.txt');
+      expect(result.type).toBe('text/plain');
+      expect(result.data.toString()).toBe(yaml.stringify({ name: 'John', age: 30 }));
+    });
+
+    test('converts image/png to image/jpeg', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'image/png', size: 0 });
+      const data = Buffer.from(
+        await sharp({
+          create: {
+            width: 1,
+            height: 1,
+            channels: 4,
+            background: { r: 255, g: 0, b: 0, alpha: 1 },
+          },
+        })
+          .png()
+          .toBuffer()
+      );
+      const result = await fragment.convertTo(data, '.jpg');
+      expect(result.type).toBe('image/jpeg');
+      expect(result.data).toBeInstanceOf(Buffer);
+    });
+
+    test('throws error for unsupported conversion', async () => {
+      const fragment = new Fragment({ ownerId: '1234', type: 'text/plain', size: 0 });
+      const data = Buffer.from('hello');
+      await expect(fragment.convertTo(data, '.html')).rejects.toThrow('Unsupported conversion');
     });
   });
 });

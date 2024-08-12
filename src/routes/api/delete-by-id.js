@@ -9,13 +9,11 @@ module.exports = async (req, res) => {
     const fragment = await Fragment.byId(ownerId, id);
     logger.info(`Fragment metadata retrieved for id: ${id}`);
     logger.info({ fragment }, 'Fragment metadata retrieved to be deleted');
-    console.log(fragment);
     
     await Fragment.delete(ownerId, id);
     res.status(200).json(createSuccessResponse());
   } catch (err) {
     logger.error({ err }, `Error deleting fragment metadata, for id: ${id}`);
-    console.log(err);
     res.status(404).json(createErrorResponse(404, err.message));
   }
 };

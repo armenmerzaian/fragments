@@ -81,7 +81,7 @@ describe('GET /v1/fragments/:id', () => {
     await fragment.setData(Buffer.from('# This is a fragment'));
 
     const res = await request(app)
-      .get(`/v1/fragments/${fragmentId}.txt`)
+      .get(`/v1/fragments/${fragmentId}.png`)
       .auth(userEmail, 'password1');
     expect(res.statusCode).toBe(415);
     expect(res.body.status).toBe('error');
@@ -103,7 +103,7 @@ describe('GET /v1/fragments/:id', () => {
       .auth(userEmail, 'password1');
     expect(res.statusCode).toBe(200);
     expect(res.headers['content-type']).toBe('text/html');
-    expect(res.text).toBe('<h1>This is a fragment</h1>\n');
+    expect(res.text).toBe('<h1>This is a fragment</h1>');
   });
 
 });
