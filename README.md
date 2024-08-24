@@ -1,6 +1,13 @@
 # Fragments
 
-This is the semester project for DPS955: Cloud Computing for Programmers (AWS)
+The Fragments Microservice API is designed to efficiently handle and manage small fragments of text and images, supporting various data formats such as plain text, Markdown, HTML, JSON, YAML, and common image formats (PNG, JPEG, WebP, etc.). Built with Node.js and leveraging AWS services (S3, DynamoDB, ECS, Cognito), this microservice ensures scalable, secure, and performant data storage and retrieval.
+
+Key Features:
+Multi-format Support: Manage text and image fragments in multiple formats with dynamic format conversion capabilities.
+Scalable Architecture: Utilizes AWS infrastructure and Dockerized containers with horizontal scaling for high availability and performance.
+Secure Authentication: Integrated with AWS Cognito to ensure secure access control and user isolation.
+Robust CI/CD Pipeline: Automated testing, linting, and deployment via GitHub Actions, ensuring continuous integration and delivery.
+This microservice is ideal for applications that require flexible, scalable, and secure handling of diverse data fragments.
 
 ## Fragments API
 
